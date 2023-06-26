@@ -1,0 +1,34 @@
+.mediaToggle {
+  position: fixed;
+  transform: translateX(-50%) translateY(-50%) rotate(225deg) !important;
+  background: none;
+  transition: transform 1s, visibility 1s, opacity 1s !important;
+  z-index: 1000000;
+}
+
+.x {
+  transform: translateX(-50%) translateY(-50%) rotate(0deg) !important;
+  transition: transform 1s, visibility 1s, opacity 1s !important;
+}
+
+.mediaToggle canvas {
+  z-index: 99;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  /*transform: translateX(-50%) translateY(0%);*/
+  background: none;
+  height: 100%;
+  width: 100%;
+}
+
+.mediaToggle {
+    width: 50px;
+    height: 50px;
+    max-width: 6vmin;
+    max-height: 6vmin;
+    min-width: 25px;
+    min-height: 25px;
+    left: 40px;
+    top: 40px;
+  }

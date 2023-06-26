@@ -1,0 +1,171 @@
+.mediaplayer {
+  position: fixed;
+  left: 50vw;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  background: none;
+}
+
+.mediaplayer canvas, .mediacontrols {
+  z-index: 99;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  /*transform: translateX(-50%) translateY(0%);*/
+  background: none;
+  height: 100%;
+  width: 100%;
+}
+
+.mediacontrols {
+  z-index: 101;
+}
+
+.audioControls  {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.mediaplayer #trackName {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translateY(0%);
+  color: yellow;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 101;
+  width: 50%;
+  height: 20%;
+  box-sizing: border-box;
+}
+
+#circleTrack { 
+  z-index: -2;
+  width: 100%; 
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  fill: yellow;
+  letter-spacing: 1px;
+  font-size: 3px
+}
+
+.mediabuttons{
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-aspect-ratio: 1/1) {
+    .mediaplayer{
+      width: 90vh;
+      height: 90vh;
+    }
+    .mediaplayer #trackName{
+      bottom: .85vh;
+      font-size: 3vh
+    }
+}
+@media (max-aspect-ratio: 1/1) {
+  .mediaplayer {
+    width: 90vw;
+    height: 90vw;
+  }
+  .mediaplayer #trackName{
+    bottom: 1.2vw;
+    font-size: 4vw
+  }
+}
+
+.mediaplayer button {
+  position: absolute;
+  transform: translateX(-50%) translateY(-50%);
+  width: 7%;
+  height: 7%;
+  top: 50%;
+  background: transparent;
+    border: none !important;
+    box-shadow: none !important;
+    font-size:0;
+    outline: none;
+}
+
+.mediaplayer #playPause{
+  left: 50%;
+  top: 41%;
+}
+
+.mediaplayer #prevTrack{
+  left: 40%;
+}
+
+.mediaplayer #nextTrack{
+  left: 60%;
+}
+
+.mediaplayer #HD{
+  left: 55.5%;
+  top: 35%;
+  width: 13%;
+  height: 6%;
+  transform: rotate(45deg);
+}
+
+.mediaplayer #AA{
+  left: 31.5%;
+  top: 35%;
+  width: 13%;
+  height: 6%;
+  transform: rotate(-45deg);
+}
+
+.mediaplayer #INFO{
+  left: 50%;
+  top: 59%;
+  width: 6%;
+  height: 6%;
+}
+
+.mediaplayer #trackName span {
+  display: inline-block;
+  margin: 0;
+  padding-left: 100%;
+  /* show the marquee just outside the paragraph */
+  will-change: transform;
+  -moz-animation: scroll-left 2s linear infinite;
+  -webkit-animation: scroll-left 2s linear infinite;
+  animation: scroll-left 20s linear infinite;
+}
+        
+@-moz-keyframes scroll-left {
+  0% {
+    -moz-transform: translateX(0%);
+  }
+  100% {
+    -moz-transform: translateX(-100%);
+  }
+}
+
+@-webkit-keyframes scroll-left {
+  0% {
+    -webkit-transform: translateX(0%);
+  }
+  100% {
+    -webkit-transform: translateX(-100%);
+  }
+}
+
+@keyframes scroll-left {
+  0% {
+    -moz-transform: translateX(0%);
+    -webkit-transform: translateX(0%);
+    transform: translateX(0%);
+  }
+  100% {
+    -moz-transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+  }
+}
+

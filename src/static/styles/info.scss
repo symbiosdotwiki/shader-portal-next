@@ -1,0 +1,107 @@
+$holoColor: #40BAF0;
+$holoColorDark: darken($holoColor, 20%);
+$holoColorA: rgba($holoColor, .2);
+$holoColorADark: rgba($holoColorDark, .1);
+$radGrad: radial-gradient($holoColorA, $holoColorADark 100%);
+$holoShadow: 0 0 3vmin $holoColor;
+
+@keyframes godrays {
+  @for $i from 0 through 100 {
+    #{$i /100 * 100%} {
+      background-image: 
+      $radGrad,
+      repeating-conic-gradient(from 0deg + random(359) at 50% 65%, 
+        $holoColorADark 0% + random(5), $holoColorA 5% + random(12), $holoColorADark 15% + random(20)
+      );
+    } 
+  }
+}
+
+#info-pop {
+  position: fixed;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 1vmin;
+  animation: godrays 6s infinite linear;
+  color: white;
+  text-shadow: 0 0 .7vmin rgb(255, 255, 255);
+  font-size: 2.2vmin;
+  overflow: scroll;
+
+  -webkit-box-shadow: $holoShadow; 
+  -moz-box-shadow: $holoShadow; 
+  box-shadow: $holoShadow;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#info-pop::-webkit-scrollbar {
+  display: none;
+}
+
+.popClose {
+    width: 4vmin;
+  height: 6vmin;
+  opacity: 0;
+    top: 59%;
+  transition: top .5s .5s, opacity .25s .75s, width .5s, height .5s .5s;
+}
+
+.popOpen {
+   width: 57vmin;
+  height: 57vmin;
+    opacity: .9;
+      top: 50%;
+  transition: top .5s, opacity .25s, height .5s, width .5s .5s;
+}
+
+#info-text {
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 50vmin;
+  height: 50vmin;
+  padding: 4vmin;
+  padding-top: 1vmin;
+  padding-bottom: 6vmin;
+}
+
+$scanlineSize: 4px;
+
+@keyframes scanliness {
+  0% {
+    background-position: top 0px left 0;
+  }
+  100% {
+   background-position: top $scanlineSize left 0;
+  }
+}
+
+.crt {
+  pointer-events: none;
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background-size: $scanlineSize $scanlineSize;
+  background-image: linear-gradient(0deg,
+      $holoColorA, transparent, $holoColorDark);
+
+  animation: scanliness .4s infinite linear;
+  z-index: 100;
+  mix-blend-mode: multiply;
+}
+
+.crtClose {
+  opacity: .0;
+  transition: opacity .25s .75s;
+}
+
+.crtOpen {
+  opacity: .3;
+  transition: opacity .25s;
+}

@@ -1,0 +1,186 @@
+
+a {
+  text-decoration: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+/*  Background fallback in case of IE8 & down, or in case video doens't load, such as with slower connections  */
+  background: #000;
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: "Courier New", Courier, monospace;
+  cursor: cell;
+}
+
+.resize-animation-stopper * {
+  animation: none !important;
+  transition: none !important;
+}
+
+#enterButton {
+  all: unset;
+  color: black;
+  -webkit-text-fill-color: black;
+  background-color: white;
+  padding-left: 5px;
+  padding-right: 6px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  cursor: crosshair;
+  border-style: solid;
+  border-color: white;
+  border-width: 2px;
+}
+
+#enterButton:hover {
+  color: white;
+  -webkit-text-fill-color: white;
+  background-color: black;
+}
+
+#enterBtnDiv{
+  position: fixed;
+  top: 60vh;
+  left: 12.5vw;
+  transform: translateY(100%);
+}
+
+button, .mediaToggle, #info-pop{
+  cursor: pointer;
+}
+
+/*canvas{
+  position: absolute;
+  
+}
+*/
+.hidden {
+    transition: visibility 1s, opacity 1s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.hidden-fast {
+    transition: visibility 0s, opacity 0s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.shown {
+    transition: visibility 1s, opacity 1s;
+    visibility: visible;
+    opacity: 1;
+}
+
+.shown-fast {
+    transition: visibility 0s, opacity 0s;
+    visibility: visible;
+    opacity: 1;
+}
+
+.overlay {
+	position: fixed;
+  background-color: black;
+  z-index: 100;
+}
+
+.center {
+	position: fixed;
+	top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+/* Mini Player */
+
+.audioControls{
+  z-index: 1000;
+}
+
+
+/*Loader */
+
+.loader canvas {
+  z-index: 100;
+  width: 25vmin;
+  height: 25vmin;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.loader-mini canvas {
+  z-index: 100;
+  width: 10vmin;
+  height: 10vmin;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.bg canvas{
+	position: fixed;
+  background-color: black;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+}
+
+.container {
+  width: 100vw;
+  height: 100vh;
+  overflow-x:hidden;
+  position: fixed;
+}
+
+.intro {
+  background: black;
+  z-index: 1;
+  color: white;
+  font-size: 1.8vmin;
+}
+
+/*@media only screen and (max-width: 600px) {
+  .intro {
+    font-size: 1.5vh;
+  }
+}*/
+
+.introcover {
+  background: black;
+  z-index: -2;
+}
+
+.centerI {
+  position: absolute;
+  /*top: 50%;*/
+  left: 12.5vw;
+  transform: translateY(-100%);
+    /*left:  12.5vw;*/
+    width: 75vw;
+    top: 50vh;
+}
+@media (min-aspect-ratio: 5/4) {
+  .centerI {
+    width: 38.5vw;
+    top: 60vh;
+  }
+}
+
+.blinking{
+    animation:blinkingText .6s infinite;
+}
+@keyframes blinkingText{
+    0%{     color: #fff;    }
+    49%{    color: #fff; }
+    60%{    color: transparent; }
+    99%{    color:transparent;  }
+    100%{   color: #fff;    }
+}
+
