@@ -98,7 +98,7 @@ float decode(vec2 channels) {
 }
 
 vec2 extract(sampler2D tex, vec2 texcoord){
-	vec4 valueRAW = texture2D(tex, texcoord);
+	vec4 valueRAW = texture2D(tex, mod(texcoord, 1.));
 	return vec2(decode(valueRAW.rg), decode(valueRAW.ba));
 }
 
@@ -318,11 +318,11 @@ void main() {
 		x += v * maxVel / resolution;
 
 
-		if(length(x -.5 + .1*unitCircle(n2rand().r * 22.*PI)) > .42){
-			x = vec2(0.5) + .1 * unitCircle(n2rand().x*200.) + .1 * unitCircle((n2rand().y*500.));
-		}
+		// if(length(x -.5 + .1*unitCircle(n2rand().r * 22.*PI)) > .42){
+		// 	x = vec2(0.5) + .25 * unitCircle(n2rand().x*200.) + .1 * unitCircle((n2rand().y*500.));
+		// }
 
-		// x = abs(abs(abs(x) - 1.0) - 1.0);
+		x = mod(x, 1.);
 
 		gl_FragColor = pack(x);
 		// gl_FragColor = pack(x);

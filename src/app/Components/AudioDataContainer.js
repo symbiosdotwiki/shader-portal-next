@@ -3,11 +3,6 @@ import React from 'react'
 import AudioControls from './AudioControls'
 import Toggle from './Toggle'
 import Loader from './Loader'
-import * as twglr from '@/helpers/twgl'
-
-// import Feedback from './Feedback'
-// import Particles from './Particles'
-// import Hoping from './Hoping'
 
 import Track from './Track'
 
@@ -23,8 +18,6 @@ function clamp(number, min, max) {
 
 
 class AudioDataContainer extends React.Component {
-
-  // router = useRouter()
 
   audioFile = new Audio()
   contextClass = (
@@ -105,7 +98,6 @@ class AudioDataContainer extends React.Component {
         else if(e.keyCode == 70){
           this.toggleHD()
         }
-        //console.log(e.keyCode)
     }
     addEventListener("dblclick", (event) => this.toggleHide())
     setTimeout(() => this.setState({loadVizzy: true}), 100)
@@ -120,9 +112,7 @@ class AudioDataContainer extends React.Component {
   }
 
   mp3Src = (tracknum) => {
-    // console.log(tracknum)
     return mp3Loc+this.props.TRACKLIST[tracknum].source
-    //process.env.PUBLIC_URL+
   }
 
   setScreenOrientation = () => {
@@ -141,7 +131,6 @@ class AudioDataContainer extends React.Component {
       if(this.audioState == 'playing'){
         this.audioFile.play()
       }
-      // console.log('AUDIO LOADED')
     })
     , waitTime)
   }
@@ -179,7 +168,6 @@ class AudioDataContainer extends React.Component {
   }
 
   playAudio = () => {
-    // console.log(this.state.audioLoaded, this.audioState, this.audioFile)
     this.audioFile.play()
     this.audioContext.resume()
     this.audioState = 'playing'
@@ -210,7 +198,6 @@ class AudioDataContainer extends React.Component {
   nextAudio = (audioState) => {
     const {DEMO_MODE} = this.props
     if(this.state.trackNum < this.props.TRACKLIST.length-1 && !DEMO_MODE){
-      // console.log('clicked')
       this.setState({
         trackNum:this.state.trackNum + 1,
         audioLoaded:false,
@@ -298,7 +285,6 @@ class AudioDataContainer extends React.Component {
   }
 
   incrementToggle = (toggleType) => {
-    // console.log(toggleType)
     if(this.toggleVal < 30 && toggleType == 'mini'){
       this.toggleVal += 1
       this.toggleLerp = setTimeout(() => this.incrementToggle(toggleType), 33)
@@ -307,7 +293,6 @@ class AudioDataContainer extends React.Component {
       this.toggleVal -= 1
       this.toggleLerp = setTimeout(() => this.incrementToggle(toggleType), 33)
     }
-    // console.log(this.toggleVal)
   }
 
   toggleStatus = (toggleType) => {
@@ -353,7 +338,6 @@ class AudioDataContainer extends React.Component {
   }
 
   visualizer = (trackNum) => {
-    // const components = [Feedback, Particles, Hoping]
     const components = this.props.TRACKLIST.map(r => r.component)
     const compNum = Math.max(0, Math.min(components.length, trackNum))
     return <Track 
@@ -407,6 +391,7 @@ class AudioDataContainer extends React.Component {
             shaders={shaders}
             toggleStatus={this.toggleStatus}
             audioLoadedOnce={audioLoadedOnce}
+            getHDAA={this.getHDAA}
           />
           {miniController}
           {mediaController}

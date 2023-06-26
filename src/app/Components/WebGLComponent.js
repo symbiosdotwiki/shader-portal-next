@@ -28,6 +28,9 @@ class WebGLComponent extends Component {
   nextRenderFrame = null
   nextFrame = 1
 
+  numParticles = 0
+  pointBufferInfo = null
+
   canvasSize = () => {
     // return [this.gl.canvas.width * this.pixRat, this.gl.canvas.height * this.pixRat]
     return [this.gl.canvas.width, this.gl.canvas.height]
@@ -86,8 +89,40 @@ class WebGLComponent extends Component {
     return matchCanvasI
   }
 
+  setupParticleBuffer = () => {
+    let np = this.numParticles
+    let n = 0
+    let m = 0
+    if(isNumber(np)){
+      n = np
+      m = 1
+    }
+    else if(Array.isArray(np)){
+      n = np[0]
+      m = np[1]
+    }
+    else{
+      return
+    }
+    const pointData = []
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < m; j++) {
+        pointData.push((i+.5) / n)
+        pointData.push((j+.5) / m)
+      }
+    }
+    const pointsObject = { 
+      position: { data: pointData, numComponents: 2 } 
+    }
+    this.pointBufferInfo = twgl.createBufferInfoFromArrays(
+      this.gl, pointsObject
+    )
+  }
+
   setupBuffers = () => {
     this.bufferInfo = twgl.primitives.createXYQuadBufferInfo(this.gl)
+
+    this.setupParticleBuffer()
 
     this.buffers = {}
     this.resizeBuffers = []
@@ -115,6 +150,7 @@ class WebGLComponent extends Component {
       depth: false, antialiasing: false
     })
     this.gl.clearColor(0, 0, 0, 1)
+    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true)
   }
 
   setupUser = () => {}
@@ -157,6 +193,11 @@ class WebGLComponent extends Component {
   }
 
   renderLoop = (time) => {}
+
+  runProgram = (pro, uni, fb=null, bi=null, pts=null) => {
+    const bufferInfo = bi ? bi : this.bufferInfo
+    twglr.runProgram(this.gl, pro, uni, bufferInfo, fb, pts)
+  }
 
   setHDAA = () => {
     this.hdAA = this.props.getHDAA()

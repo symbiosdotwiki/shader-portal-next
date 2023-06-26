@@ -25,14 +25,9 @@ class Loader extends WebGLComponent {
       border: .01
     }
 
-    twglr.runProgram(gl, programYY, uniformsYY, this.bufferInfo, gl.canvas)
+    this.runProgram(programYY, uniformsYY, gl.canvas)
   }
 
-  // render(){
-  //   return (
-  //       <canvas ref={this.CANVAS_REF}/>
-  //   )
-  // }
 
 }
 export default Loader 

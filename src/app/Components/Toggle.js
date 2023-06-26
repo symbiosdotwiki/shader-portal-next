@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-
 import { render } from 'react-dom'
+
+import WebGLComponent from './WebGLComponent'
+
 import * as twglr from '@/helpers/twgl'
 import { getCanvasMousePosition } from '@/helpers/screen'
 
@@ -8,92 +10,40 @@ import '@/static/styles/mediaToggle.css'
 
 var twgl = twglr.twgl;
 
-class Toggle extends Component {
+class Toggle extends WebGLComponent {
 
-  mousePos = {x: 0, y: 0}
-  pixRat = window.devicePixelRatio || 1
-
-  handleMouseMove = (event) => {
-      this.mousePos = getCanvasMousePosition(event, this.CANVAS_REF.current)
+  programDefs = {
+    'programMedia' : ['default.vs', 'mediaToggle.fs']
   }
+
+  textureDefs = {
+      'diffuse': { src: this.props.tex["x.jpg"] },
+      'normal': { src: this.props.tex["x N.jpg"] },
+    }
 
   constructor(props) {
     super(props)
-    this.CANVAS_REF = React.createRef()
     this.state = {
       toggleStatus: 'mini',
-      wglLoaded: false,
+      wglLoaded: true,
     }
   }
 
-  componentDidMount() {
-    const { type, tex } = this.props;
-    
-    const gl = this.CANVAS_REF.current.getContext(
-      'webgl', { antialias: true }
-    )
-    this.gl = gl
-
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    this.programInfo = twglr.createProgramInfo(
-      gl, this.props.shaders, 'test.vs', 'mediaToggle.fs'
-    )
-
-    this.bufferInfo = twglr.createCanvasBuffer(gl)
-
-    this.textures = twgl.createTextures(gl, {
-      diffuse: { src: tex["x.jpg"] },
-      normal: { src: tex["x N.jpg"] },
-    }, () => this.setState({wglLoaded: true}, this.startRender)
-    )
-
-    // console.log(tex, this.textures)
-    
-    
-
-    // this.setState({
-    //   // gl: gl, 
-    //   // programInfo: programInfo,
-    //   // bufferInfo: bufferInfo,
-    //   // textures: textures
-    // }, this.startRender)
-
-    
-
-
-    // this.startRender()
-
-
-    window.addEventListener('mousemove', (event) => this.handleMouseMove(event))
-  }
-
-  startRender = () => {
-    requestAnimationFrame(this.renderGl)
-  }
-
-  renderGl = (time) => {
-    const { gl, programInfo, bufferInfo, textures } = this
+  renderLoop = (time) => {
+    const { gl, bufferInfo, textures } = this
+    const { programMedia } = this.programs
     const { toggleStatus } = this.state
 
-    twgl.resizeCanvasToDisplaySize(gl.canvas, this.pixRat)
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-
-
-    const uniforms = {
+    const uniformsMedia = {
       TIME: time/50,
-      resolution: [gl.canvas.width, gl.canvas.height],
+      resolution: this.canvasSize(),
       light: [this.mousePos.x, this.mousePos.y, 1],
       u_diffuse: textures["diffuse"],
       u_normal: textures["normal"],
       toggleStatus: (toggleStatus != 'mini' ? 1 : 0),
     }
 
-    gl.useProgram(programInfo.program)
-    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo)
-    twgl.setUniforms(programInfo, uniforms)
-    twgl.drawBufferInfo(gl, bufferInfo)
-
-    requestAnimationFrame(this.renderGl, this.CANVAS_REF.current)
+    this.runProgram(programMedia, uniformsMedia, gl.canvas)
   }
 
   toggleStatus = (toggleType) => {
@@ -105,7 +55,6 @@ class Toggle extends Component {
 	render(){
     const { toggleStatus, wglLoaded } = this.state
     const { audioLoadedOnce } = this.props
-    // console.log('Toggle State', this.state)
     return (
       <div 
         className={

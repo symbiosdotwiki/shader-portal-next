@@ -1,112 +1,53 @@
 import React, { Component } from 'react'
-import Info from './Info'
 import { render } from 'react-dom'
+
+import Info from './Info'
+import WebGLComponent from './WebGLComponent'
+
 import * as twglr from '@/helpers/twgl'
-import { getCanvasMousePosition } from '@/helpers/screen'
 
 var twgl = twglr.twgl;
 
-class AudioControls extends Component {
+class AudioControls extends WebGLComponent {
 
-  mouseDef = {x: -999, y: -999}
-  mousePos = {x: -999, y: -999}
-  pixRat = window.devicePixelRatio || 1
-  prevCanvas = [0,0]
   toggleStatus = 0
-  hdAA = [false, false]
 
-  gl = null
-  programInfo = null
-  bufferInfo = null
-  textures = []
-
-  handleMouseMove = (event) => {
-      this.mousePos = getCanvasMousePosition(event, this.CANVAS_REF.current)
-      // console.log(this.mousePos)
-  }
-
-  resetMouse = (event) => {
-    this.mousePos = JSON.parse(JSON.stringify(this.mouseDef))
+  programDefs = {
+    'programMedia': ['default.vs', 'mediaplayer.fs']
   }
 
   constructor(props) {
+    const { tex, type } = props
     super(props)
-    this.CANVAS_REF = React.createRef()
+
+    this.textureDefs = {
+      'diffuse': { src: tex[type + " player diffuse.jpg"] },
+      'buttons': { src: tex[type + " player buttons.jpg"] },
+      'height': { src: tex[type + " player height.jpg"] },
+      'playN': { src: tex[type + " player play N.jpg"] },
+      'pauseN': { src: tex[type + " player pause N.jpg"] },
+      'lights': { src: tex[type + " player lights.jpg"] }
+    }
+
     this.state = {
       audioState: 'paused',
-      wglLoaded: false,
+      wglLoaded: true,
       toggledOn: false,
-      // gl: null, 
-      // programInfo: null,
-      // bufferInfo: null,
-      // textures: []
     }
   }
 
-  componentDidMount() {
-    const { tex, type } = this.props
-    
-    const gl = this.CANVAS_REF.current.getContext(
-      'webgl', { antialias: true }
-    )
-    this.gl = gl
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+  // setupUser() {
+  // }
 
-    this.programInfo = twglr.createProgramInfo(
-      gl, this.props.shaders, 'test.vs', 'mediaplayer.fs'
-    )
-
-    this.textures = twgl.createTextures(gl, {
-      diffuse: { src: tex[type + " player diffuse.jpg"] },
-      buttons: { src: tex[type + " player buttons.jpg"] },
-      height: { src: tex[type + " player height.jpg"] },
-      playN: { src: tex[type + " player play N.jpg"] },
-      pauseN: { src: tex[type + " player pause N.jpg"] },
-      lights: { src: tex[type + " player lights.jpg"] }
-    }, () => this.setState({wglLoaded: true})
-    )
-
-    // console.log(this.textures)
-    
-    this.bufferInfo = twglr.createCanvasBuffer(gl)
-    // console.log('bufferInfo', this.bufferInfo)
-
-    // this.setState({
-    //   // gl: gl, 
-    //   // programInfo: programInfo,
-    //   // bufferInfo: bufferInfo,
-    //   // textures: textures
-    // }, this.startRender)
-
-
-    window.addEventListener('mousemove', (event) => this.handleMouseMove(event))
-    this.startRender()
-    // window.addEventListener("touchend", (event) => this.resetMouse(event))
-    
-  }
-
-  startRender = () => {
-    requestAnimationFrame(this.renderGl, this.CANVAS_REF.current)
-  }
-
-  renderGl = (time) => {
+  renderLoop = (time) => {
     const { toggledOn, audioState } = this.state
-    const { gl, textures, programInfo, bufferInfo } = this
+    const { gl, textures, bufferInfo } = this
+    const { programMedia } = this.programs
     const { 
-      getAudioState, trackNum, audioLoaded, maxTrack, getToggleStatus,
-      getHDAA
+      getAudioState, trackNum, audioLoaded, maxTrack, getToggleStatus
     } = this.props
 
-
     this.toggleStatus = getToggleStatus()
-    this.hdAA = getHDAA()
-    let hdSize = this.hdAA[0] ? 1 : .5;
-
-    if(twgl.resizeCanvasToDisplaySize(gl.canvas, this.pixRat * hdSize)){
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-      this.prevCanvas = [gl.canvas.width, gl.canvas.height]
-      // console.log('resize')
-    }
 
     if(this.toggleStatus < .5){
 
@@ -114,10 +55,9 @@ class AudioControls extends Component {
         this.setState({toggledOn:true})
       }
 
-
-      const uniforms = {
+      const uniformsMedia = {
         TIME: time/50,
-        resolution: [gl.canvas.width, gl.canvas.height],
+        resolution: this.canvasSize(),
         light: [this.mousePos.x, this.mousePos.y, 1],
         u_diffuse: textures["diffuse"],
         u_buttons: textures["buttons"],
@@ -134,11 +74,8 @@ class AudioControls extends Component {
         ],
         toggleStatus: this.toggleStatus,
       }
+      this.runProgram(programMedia, uniformsMedia, gl.canvas)
 
-      gl.useProgram(programInfo.program)
-      twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo)
-      twgl.setUniforms(programInfo, uniforms)
-      twgl.drawBufferInfo(gl, bufferInfo)
     }
     else{
       if(toggledOn){
@@ -149,8 +86,6 @@ class AudioControls extends Component {
     if(audioState != getAudioState()){
       this.setState({audioState: getAudioState()})
     }
-
-    requestAnimationFrame(this.renderGl, this.CANVAS_REF.current)
   }
 
   calcSinCos = (radius, trackName) => {
