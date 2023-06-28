@@ -1,6 +1,5 @@
 import * as twgljs from 'twgl.js'
 export var twgl = twgljs
-// export var twgl = require('twgl.js')
 
 const canvasArrays = {
   position: [-1, -1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1, 1, 0],

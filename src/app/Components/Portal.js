@@ -1,21 +1,19 @@
 "use client"
 
-import React, { Component, useState, useEffect } from 'react'
+import React, { Component } from 'react'
 import AudioDataContainer from './AudioDataContainer'
 import { mobileAndTabletCheck, audioCheck, glCheck } from '@/helpers/screen'
-import NoSleep from 'nosleep.js'
 import '@/static/styles/main.css'
 
 function imgSrc(imgName){
   return "/media/img/"+imgName
-  //process.env.PUBLIC_URL+
 }
 
 function importAll(r) {
   return r.keys().map(r)
 }
 
-import { TRACKLIST, DEMO_MODE } from 'portal.config.js'
+import { DEMO_MODE } from 'portal.config.js'
 
 const env = process.env.NODE_ENV
 const isProd = env == "production"
@@ -28,8 +26,6 @@ class Portal extends Component {
   volume = 1
 
   skip = false
-
-  // noSleep = new NoSleep()
 
   BUTTON_TEXT = "CLICK TO START"
 
@@ -80,7 +76,6 @@ class Portal extends Component {
     this.imgSrcs = Object.values(this.props.data.imgs)
     this.imgNames = Object.keys(this.props.data.imgs)
 
-    this.TRACKLIST = TRACKLIST
     this.DEMO_MODE = isProd ? false : DEMO_MODE
     
     this.state = {
@@ -144,7 +139,6 @@ class Portal extends Component {
       <AudioDataContainer
         FIRST_TRACK={this.FIRST_TRACK}
         DEMO_MODE={this.DEMO_MODE}
-        TRACKLIST={this.TRACKLIST}
         clicked={clicked}
         hdState={this.hdState}
         aaState={this.aaState}

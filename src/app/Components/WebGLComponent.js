@@ -15,6 +15,13 @@ class WebGLComponent extends Component {
 
   mousePos = {x: 0, y: 0}
 
+  defaultPrograms = {}
+  defaultProgramDefs = {
+    'programBlack' : ['default.vs', 'black.fs'],
+    'programCopy' : ['default.vs', 'default.fs'],
+  }
+  defaultFrameBuffer = null
+  
   programs = {}
   buffers = {}
   textures = {}
@@ -32,7 +39,6 @@ class WebGLComponent extends Component {
   pointBufferInfo = null
 
   canvasSize = () => {
-    // return [this.gl.canvas.width * this.pixRat, this.gl.canvas.height * this.pixRat]
     return [this.gl.canvas.width, this.gl.canvas.height]
   }
 
@@ -52,7 +58,6 @@ class WebGLComponent extends Component {
     let bufferSizeX = 1
     let bufferSizeY = 1
 
-    // if(!bufferSize){}
     if(Array.isArray(bufferSize)
         && bufferSize.length == 2  
         && isNumber(bufferSize[0]) 
@@ -135,6 +140,17 @@ class WebGLComponent extends Component {
     })
   }
 
+  setupDefaultPrograms = () => {
+    this.defaultPrograms = twglr.createProgramInfos(
+      this.gl, this.props.shaders, this.defaultProgramDefs
+    )
+    const canvasSize = this.canvasSize()
+    this.defaultFrameBuffer = twgl.createFramebufferInfo(
+      this.gl, undefined, 
+      canvasSize[0], canvasSize[1]
+    )
+  }
+
   setupPrograms = () => {
     this.programs = twglr.createProgramInfos(
       this.gl, this.props.shaders, this.programDefs
@@ -157,6 +173,7 @@ class WebGLComponent extends Component {
 
   setup = () => {
     this.setupGL()    
+    this.setupDefaultPrograms()
     this.setupPrograms()
     this.setupBuffers()
     this.setupTextures()
@@ -199,20 +216,58 @@ class WebGLComponent extends Component {
     twglr.runProgram(this.gl, pro, uni, bufferInfo, fb, pts)
   }
 
+  setBlack = (fb) => {
+    const { programBlack } = this.defaultPrograms
+    twglr.runProgram(this.gl, programBlack, {}, this.bufferInfo, fb)
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+  }
+
+  resizeFB = (fb, key, num=null) => {
+    const bd = this.bufferDefs[key].copy
+
+    const inArr = Array.isArray(bd) && bd.includes(num)
+    const isAll = bd === 'all'
+
+    // Copy the Frame Buffer
+    if(inArr || isAll){
+      const { programCopy } = this.defaultPrograms
+
+      let copyUniforms = {
+        resolution: this.canvasSize(),
+        u_texture: fb.attachments[0],
+      }
+      this.runProgram(programCopy, copyUniforms, this.defaultFrameBuffer)
+
+      twgl.resizeFramebufferInfo(this.gl, fb)
+
+      copyUniforms['u_texture'] = this.defaultFrameBuffer.attachments[0]
+      this.runProgram(programCopy, copyUniforms, fb)
+    }
+    else{
+      twgl.resizeFramebufferInfo(this.gl, fb)
+    }
+  }
+
   setHDAA = () => {
     this.hdAA = this.props.getHDAA()
     this.hdSize = this.hdAA[0] ? 1 : this.nonHDSize
+
     if(twgl.resizeCanvasToDisplaySize(this.gl.canvas, this.hdSize * this.pixRat)){
+      twgl.resizeFramebufferInfo(this.gl, this.defaultFrameBuffer)
       this.resizeBuffers.forEach(key => {
         let b = this.buffers[key]
         if(Array.isArray(b)){
-          b.forEach(bb => twgl.resizeFramebufferInfo(this.gl, bb))
+          b.forEach( (bb, idx) => 
+            this.resizeFB(bb, key, idx)
+          )
         }
         else{
-          twgl.resizeFramebufferInfo(this.gl, b)
+          this.resizeFB(b, key)
         }
       })
     }
+    const canvasSize = this.canvasSize()
+    this.gl.viewport(0, 0, canvasSize[0], canvasSize[1])
   }
 
   renderGl = (time) => {

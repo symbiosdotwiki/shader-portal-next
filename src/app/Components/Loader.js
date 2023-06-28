@@ -2,10 +2,6 @@ import React, { Component } from 'react'
 import { render } from 'react-dom'
 
 import WebGLComponent from './WebGLComponent'
-import * as twglr from '@/helpers/twgl'
-
-
-// var twgl = twglr.twgl
 
 class Loader extends WebGLComponent {
   

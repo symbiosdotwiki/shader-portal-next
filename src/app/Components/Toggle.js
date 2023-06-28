@@ -3,12 +3,7 @@ import { render } from 'react-dom'
 
 import WebGLComponent from './WebGLComponent'
 
-import * as twglr from '@/helpers/twgl'
-import { getCanvasMousePosition } from '@/helpers/screen'
-
 import '@/static/styles/mediaToggle.css'
-
-var twgl = twglr.twgl;
 
 class Toggle extends WebGLComponent {
 

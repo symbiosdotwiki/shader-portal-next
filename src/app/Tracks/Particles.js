@@ -85,12 +85,10 @@ class Particles extends WebGLSequencer {
     'programEncode' : ['default.vs', 'encode.fs'],
     'programFeedback' : ['default.vs', 'feedback.fs'],
     'programDisplay' : ['default.vs', 'extract.fs'],
-    'programBlack' : ['default.vs', 'black.fs'],
     'programBlur' : ['default.vs', 'blur.fs'],
     'programLookup' : ['default.vs', 'lookup.fs'],
     'programPhong' : ['default.vs', 'phong.fs'],
     'programAdd' : ['default.vs', 'composite.fs'],
-    'programCopy' : ['default.vs', 'copy.fs'],
   }
 
   bufferDefs = {
@@ -104,6 +102,7 @@ class Particles extends WebGLSequencer {
     },
     'fb' : {
       num : 4,
+      copy : [1]
     }
   }
 
@@ -125,8 +124,8 @@ class Particles extends WebGLSequencer {
   renderLoop = (rTime) => {
     let { 
       programInit, programPhysics, programDraw, programFeedback,
-      programDisplay, programBlack, programBlur, programLookup,
-      programPhong, programAdd, programCopy, programEncode
+      programDisplay, programBlur, programLookup,
+      programPhong, programAdd, programEncode
     } = this.programs
     let {
       pos, vel,
@@ -139,30 +138,6 @@ class Particles extends WebGLSequencer {
 
     let { n, m, pointBufferInfo, posBufferInfo } = this
 
-    if(twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio * hdSize || hdSize)){
-      twgl.resizeFramebufferInfo(gl, fb[2])
-
-      const copyUniforms = {
-        resolution: canvasSize(),
-        u_texture: fb[1].attachments[0],
-      }
-      twglr.runProgram(gl, programCopy, copyUniforms, bufferInfo, fb[2])
-
-      twgl.resizeFramebufferInfo(gl, fb[1])
-
-      const copyUniforms2 = {
-        resolution: canvasSize(),
-        u_texture: fb[2].attachments[0],
-      }
-      twglr.runProgram(gl, programCopy, copyUniforms2, bufferInfo, fb[1])
-
-
-      twgl.resizeFramebufferInfo(gl, fb[0])
-      twgl.resizeFramebufferInfo(gl, fb[3])
-    }
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-
-
     // particle physics
     const physarumUniforms = {
       resolution: canvasSize(),
@@ -172,20 +147,16 @@ class Particles extends WebGLSequencer {
       time: audioData.curTime/this.timeMult + randomSeed + AUDIO_MID * 3,
       pass: 0,
     }
-    twglr.runProgram(gl, programPhysics, physarumUniforms, bufferInfo, vel[1])
+    this.runProgram(programPhysics, physarumUniforms, vel[1])
 
     const physarumUniforms2 = {
       pass: 1
     }
-    twglr.runProgram(gl, programPhysics, physarumUniforms2, bufferInfo, pos[1])
+    this.runProgram(programPhysics, physarumUniforms2, pos[1])
 
 
     // drawing black for particles
-    gl.useProgram(programBlack.program)
-    twgl.setBuffersAndAttributes(gl, programBlack, bufferInfo)
-    twgl.bindFramebufferInfo(gl, fb[3])
-    gl.clear(gl.COLOR_BUFFER_BIT)
-    twgl.drawBufferInfo(gl, bufferInfo)
+    this.setBlack(fb[3])
 
 
     gl.enable(gl.BLEND)
@@ -195,7 +166,7 @@ class Particles extends WebGLSequencer {
       u_texture: pos[1].attachments[0],
       HD: this.hdAA[0]
     }
-    twglr.runProgram(gl, programDraw, drawUniforms, pointBufferInfo, fb[3], 'points')
+    this.runProgram(programDraw, drawUniforms, fb[3], pointBufferInfo, 'points')
 
 
     gl.disable(gl.BLEND)
@@ -207,7 +178,7 @@ class Particles extends WebGLSequencer {
       u_texture: fb[3].attachments[0],
       ...seqUniEval
     }
-    twglr.runProgram(gl, programEncode, encodeUniforms, bufferInfo, fb[2])
+    this.runProgram(programEncode, encodeUniforms, fb[2])
 
 
     // blur prevFrame
@@ -216,23 +187,18 @@ class Particles extends WebGLSequencer {
       u_texture: fb[1].attachments[0],
       pass: 0,
     }
-    twglr.runProgram(gl, programBlur, blurUniforms, bufferInfo, fb[3])
+    this.runProgram(programBlur, blurUniforms, fb[3])
 
     const blurUniforms2 = {
       resolution: canvasSize(),
       u_texture: fb[3].attachments[0],
       pass: 1,
     }
-    twglr.runProgram(gl, programBlur, blurUniforms2, bufferInfo, fb[1])
+    this.runProgram(programBlur, blurUniforms2, fb[1])
 
 
     // drawing black
-    gl.useProgram(programBlack.program)
-    twgl.setBuffersAndAttributes(gl, programBlack, bufferInfo)
-    twgl.bindFramebufferInfo(gl, fb[0])
-    gl.clear(gl.COLOR_BUFFER_BIT)
-    // twgl.drawBufferInfo(gl, textureBuffer)
-
+    this.setBlack(fb[0])
 
     // particles feedback trails
     const feedbackUniforms = {
@@ -242,7 +208,7 @@ class Particles extends WebGLSequencer {
       HD: this.hdAA[0],
       ...seqUniEval
     }
-    twglr.runProgram(gl, programFeedback, feedbackUniforms, bufferInfo, fb[0])
+    this.runProgram(programFeedback, feedbackUniforms, fb[0])
 
     // lookup for phong
     const lookupUniforms = {
@@ -250,7 +216,7 @@ class Particles extends WebGLSequencer {
       u_texture: fb[0].attachments[0] ,
       multiplier: .7+Math.pow(AUDIO_MID, .5)*.8,
     }
-    twglr.runProgram(gl, programLookup, lookupUniforms, bufferInfo, fb[3])
+    this.runProgram(programLookup, lookupUniforms, fb[3])
 
     // shiny phong
     const phongUniforms = {
@@ -262,7 +228,7 @@ class Particles extends WebGLSequencer {
       viewDir: [0,0,-1],
       ...seqUniEval
     }
-    twglr.runProgram(gl, programPhong, phongUniforms, bufferInfo, fb[2])
+    this.runProgram(programPhong, phongUniforms, fb[2])
 
     // drawing display
     const addUniforms = {
@@ -273,7 +239,7 @@ class Particles extends WebGLSequencer {
       saturation: AUDIO_LOW * 5,
       ...seqUniEval
     }
-    twglr.runProgram(gl, programAdd, addUniforms, bufferInfo, gl.canvas)
+    this.runProgram(programAdd, addUniforms, gl.canvas)
 
     // ping-pong buffers
     this.pingPong('pos', [0,1])

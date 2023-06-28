@@ -89,3 +89,7 @@ export var glCheck = function() {
   canvas.remove()
   return {}
 }
+
+function clamp(number, min, max) {
+  return Math.max(min, Math.min(number, max));
+}

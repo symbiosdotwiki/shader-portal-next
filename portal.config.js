@@ -1,6 +1,9 @@
 export const DEMO_MODE = false
 
+export const MP3_LOC = "/media/mp3/"
+
 export const SINGLE_TRACK = "wavelet.mp3"
+export const LOOP_SINGLE_TRACK = true
 
 export const TRACKLIST = [
   {

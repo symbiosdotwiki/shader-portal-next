@@ -4,10 +4,6 @@ import path from 'path'
 const shaderExts = ['.glsl', '.fs', '.vs', '.vert', '.frag']
 const imgExts = ['.jpg', '.png']
 
-// import Image from 'next/image'
-
-// const tttt = require('@/shaders/feedback/random.fs')
-
 const throughDirectory = (directory, exts, allFiles) => {
   fs.readdirSync(directory).forEach(file => {
     const absPath = path.join(directory, file)

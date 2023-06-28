@@ -4,10 +4,6 @@ import { render } from 'react-dom'
 import Info from './Info'
 import WebGLComponent from './WebGLComponent'
 
-import * as twglr from '@/helpers/twgl'
-
-var twgl = twglr.twgl;
-
 class AudioControls extends WebGLComponent {
 
   toggleStatus = 0
