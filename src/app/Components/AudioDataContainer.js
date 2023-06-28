@@ -375,6 +375,7 @@ class AudioDataContainer extends React.Component {
       getAudioState={this.getAudioState}
       getHDAA={this.getHDAA}
       toggleHD={this.toggleHD}
+      toggleAA={this.toggleAA}
       type={type}
       tex={this.props.tex}
       shaders={this.props.shaders}
