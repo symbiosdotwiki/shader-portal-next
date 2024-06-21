@@ -2,7 +2,7 @@ Work In Progress!
 
 This is a Next.js template for creating audio visual experiences in the web using GLSL shaders, particles systems, JPG interfaces, audio FFT analysis, and keyframing.
 
-DEMO: https://intheory.symbios.wiki/
+DEMO (best viewed on desktop with graphics card): https://intheory.symbios.wiki/
 
 Thanks to Beau for supporting the project :3
 
